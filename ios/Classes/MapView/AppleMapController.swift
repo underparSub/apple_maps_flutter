@@ -288,21 +288,20 @@ extension AppleMapController: MKMapViewDelegate {
         }
         self.channel.invokeMethod("camera#onIdle", arguments: "")
     }
-   public func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
+    public func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
         let center = mapView.region.center
-        let zoom = mapView.calculatedZoomLevel
-        let pitch = mapView.camera.pitch
-        let heading = mapView.camera.heading
-
-        self.channel.invokeMethod("camera#onMove", arguments: [
+        let point = mapView.convert(center, toPointTo: mapView)
+    
+        channel.invokeMethod("camera#onPoints", arguments: [
             "position": [
-                "heading": heading,
-                "target": [center.latitude, center.longitude],
-                "pitch": pitch,
-                "zoom": zoom
-            ]
+                "heading": mapView.camera.heading,
+                "pitch": mapView.camera.pitch,
+                "zoom": mapView.calculatedZoomLevel,
+                "target": [center.latitude, center.longitude]
+            ],
+            "screenPoint": [point.x, point.y]
         ])
-    }
+}
     
     
     // onMoveStarted
