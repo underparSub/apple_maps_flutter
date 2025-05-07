@@ -44,6 +44,8 @@ class AppleMapController {
           CameraPosition.fromMap(call.arguments['position'])!,
         );
         break;
+      case 'camera#onPoints': 
+          _appleMapState.widget.onPoints(call.arguments['arguments']);
       case 'camera#onIdle':
         _appleMapState.widget.onCameraIdle?.call();
         break;
