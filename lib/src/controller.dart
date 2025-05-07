@@ -45,7 +45,7 @@ class AppleMapController {
         );
         break;
       case 'camera#onPoints': 
-          _appleMapState.widget.onPoints(call.arguments['screenPoint']);
+          _appleMapState.widget.onCameraOffsets?.call(call.arguments['screenPoint']);
       case 'camera#onIdle':
         _appleMapState.widget.onCameraIdle?.call();
         break;
