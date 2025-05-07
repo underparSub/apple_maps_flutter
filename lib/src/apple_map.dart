@@ -108,7 +108,7 @@ class AppleMap extends StatefulWidget {
   /// This may be called as often as once every frame and should
   /// not perform expensive operations.
   final CameraPositionCallback? onCameraMove;
-  final Function(List<double>)? onCameraOffsets;
+  final Function(dynamic)? onCameraOffsets;
 
   /// Called when camera movement has ended, there are no pending
   /// animations and the user has stopped interacting with the map.
