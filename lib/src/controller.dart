@@ -241,6 +241,19 @@ class AppleMapController {
     return Offset(doubles.first, doubles.last);
   }
 
+  Future<LatLng?> getLatLngFromScreenCoordinate(Offset offset) async {
+    final point = await channel.invokeMapMethod<String, dynamic>(
+      'camera#pointToLatLng',
+      <String, dynamic>{
+        'screenPoint': [offset.dx, offset.dy]
+      },
+    );
+  
+    if (point == null || !point.containsKey('latLng')) return null;
+    final latLngList = List<double>.from(point['latLng']);
+    return LatLng(latLngList[0], latLngList[1]);
+}
+
   /// Returns the image bytes of the map
   Future<Uint8List?> takeSnapshot(
       [SnapshotOptions snapshotOptions = const SnapshotOptions()]) {
