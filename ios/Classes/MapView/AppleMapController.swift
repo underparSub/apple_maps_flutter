@@ -319,7 +319,7 @@ extension AppleMapController: MKMapViewDelegate {
     //         ],
     //         "screenPoint": [point.x, point.y]
     //     ])
-}
+    // }
     
     
     // onMoveStarted
