@@ -101,6 +101,9 @@ public class AppleMapController: NSObject, FlutterPlatformView {
                 case "camera#convert":
                     self.cameraConvert(args: args, result: result)
                     break
+                case "camera#pointToLatLng":
+                    self.screenPointToLatLng(args: args, result: result)
+                    break
                 case "map#takeSnapshot":
                     self.takeSnapshot(options: SnapshotOptions.init(options: args), onCompletion: { (snapshot: FlutterStandardTypedData?, error: Error?) -> Void in
                         result(snapshot ?? error)
@@ -234,6 +237,21 @@ public class AppleMapController: NSObject, FlutterPlatformView {
         let point = self.mapView.convert(CLLocationCoordinate2D(latitude: annotation[0] , longitude: annotation[1]), toPointTo: self.view())
         result(["point": [point.x, point.y]])
     }
+
+    private func screenPointToLatLng(args: Dictionary<String, Any>, result: FlutterResult) -> Void {
+        guard let screenPoint = args["screenPoint"] as? Array<Double>, screenPoint.count == 2 else {
+            result(nil)
+            return
+        }
+    
+        let point = CGPoint(x: screenPoint[0], y: screenPoint[1])
+        let coordinate = self.mapView.convert(point, toCoordinateFrom: self.view())
+    
+        result([
+            "latLng": [coordinate.latitude, coordinate.longitude]
+        ])
+}
+
     
     private func toPositionData(data: Array<Any>, animated: Bool) -> Dictionary<String, Any> {
         var positionData: Dictionary<String, Any> = [:]
