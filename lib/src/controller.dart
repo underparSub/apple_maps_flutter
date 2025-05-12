@@ -260,4 +260,10 @@ class AppleMapController {
     return channel.invokeMethod<Uint8List>(
         'map#takeSnapshot', snapshotOptions._toMap());
   }
+   Future<Uint8List?> takeSnapshotFromView(double quality) async {
+    return await channel.invokeMethod<Uint8List>(
+        'map#takeSnapshotFromView',  <String, dynamic>{
+        'quality': quality
+      },);
+  }
 }
