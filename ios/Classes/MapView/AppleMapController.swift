@@ -340,6 +340,56 @@ extension AppleMapController: MKMapViewDelegate {
 }
 
 extension AppleMapController {
+    private func takeSnapshotFromView(
+    quality: Double,
+    onCompletion: @escaping (FlutterStandardTypedData?, Error?) -> Void) {
+    DispatchQueue.main.async {
+        guard self.mapView.window != nil else {
+            let error = NSError(
+                domain: "snapshot",
+                code: -2,
+                userInfo: [NSLocalizedDescriptionKey: "mapView is not in view hierarchy"]
+            )
+            onCompletion(nil, error)
+            return
+        }
+
+        autoreleasepool {
+            let renderer = UIGraphicsImageRenderer(size: self.mapView.bounds.size)
+            var image = renderer.image { _ in
+                self.mapView.drawHierarchy(in: self.mapView.bounds, afterScreenUpdates: true)
+            }
+
+            // fallback if size is zero
+            if image.size.width == 0 || image.size.height == 0 {
+                image = renderer.image { _ in
+                    self.mapView.drawHierarchy(in: self.mapView.bounds, afterScreenUpdates: false)
+                }
+            }
+
+            // compressionQuality 값 보정 (0.0 ~ 1.0)
+            let clampedQuality = max(0.0, min(1.0, quality))
+
+            guard let data = image.jpegData(compressionQuality: clampedQuality) else {
+                let error = NSError(
+                    domain: "snapshot",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "JPEG encoding failed"]
+                )
+                onCompletion(nil, error)
+                return
+            }
+
+            let result = FlutterStandardTypedData(bytes: data)
+            onCompletion(result, nil)
+        }
+    }
+}
+
+
+
+
+    
     private func takeSnapshot(options: SnapshotOptions, onCompletion: @escaping (FlutterStandardTypedData?, Error?) -> Void) {
         // MKMapSnapShotOptions setting.
         snapShotOptions.region = self.mapView.region
