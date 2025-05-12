@@ -105,7 +105,9 @@ public class AppleMapController: NSObject, FlutterPlatformView {
                     self.screenPointToLatLng(args: args, result: result)
                     break
                 case "map#takeSnapshotFromView": 
-                    self.takeSnapshotFromView(args: args["quality"] as! Double, result: result)
+                    self.takeSnapshotFromView(quality: args["quality"] as? Double, onCompletion: { (snapshot: FlutterStandardTypedData?, error: Error?) -> Void in
+                        result(snapshot ?? error)
+                    })
                     break;
                 case "map#takeSnapshot":
                     self.takeSnapshot(options: SnapshotOptions.init(options: args), onCompletion: { (snapshot: FlutterStandardTypedData?, error: Error?) -> Void in
