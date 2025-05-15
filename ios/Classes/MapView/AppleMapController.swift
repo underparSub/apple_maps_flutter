@@ -234,13 +234,14 @@ public class AppleMapController: NSObject, FlutterPlatformView {
         }
     }
     
-    private func cameraConvert(args: Dictionary<String, Any>, result: FlutterResult) -> Void {
-       DispatchQueue.global().async { [weak self] in
+   private func cameraConvert(args: Dictionary<String, Any>, result: FlutterResult) {
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
         guard let self = self else {
             result(FlutterError(code: "NULL_SELF", message: "Self is nil", details: nil))
             return
         }
 
+        // 1. annotation 파싱 및 검증
         guard let annotation = args["annotation"] as? [Double], annotation.count == 2 else {
             result(FlutterError(code: "INVALID_ARGS", message: "Invalid annotation format", details: nil))
             return
@@ -248,9 +249,15 @@ public class AppleMapController: NSObject, FlutterPlatformView {
 
         let coordinate = CLLocationCoordinate2D(latitude: annotation[0], longitude: annotation[1])
 
+        
         DispatchQueue.main.async {
-            guard let mapView = self.mapView, let view = self.view() else {
-                result(FlutterError(code: "VIEW_NULL", message: "mapView or view is nil", details: nil))
+            guard let mapView = self.mapView else {
+                result(FlutterError(code: "VIEW_NULL", message: "mapView is nil", details: nil))
+                return
+            }
+
+            guard let view = self.view() as? UIView else {
+                result(FlutterError(code: "VIEW_NULL", message: "view is invalid", details: nil))
                 return
             }
 
@@ -258,7 +265,8 @@ public class AppleMapController: NSObject, FlutterPlatformView {
             result(["point": [point.x, point.y]])
         }
     }
-    }
+}
+
 
     private func screenPointToLatLng(args: Dictionary<String, Any>, result: FlutterResult) -> Void {
         guard let screenPoint = args["screenPoint"] as? Array<Double>, screenPoint.count == 2 else {
