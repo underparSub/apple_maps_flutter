@@ -235,12 +235,29 @@ public class AppleMapController: NSObject, FlutterPlatformView {
     }
     
     private func cameraConvert(args: Dictionary<String, Any>, result: FlutterResult) -> Void {
-        guard let annotation = args["annotation"] as? Array<Double> else {
-            result(nil)
+       DispatchQueue.global().async { [weak self] in
+        guard let self = self else {
+            result(FlutterError(code: "NULL_SELF", message: "Self is nil", details: nil))
             return
         }
-        let point = self.mapView.convert(CLLocationCoordinate2D(latitude: annotation[0] , longitude: annotation[1]), toPointTo: self.view())
-        result(["point": [point.x, point.y]])
+
+        guard let annotation = args["annotation"] as? [Double], annotation.count == 2 else {
+            result(FlutterError(code: "INVALID_ARGS", message: "Invalid annotation format", details: nil))
+            return
+        }
+
+        let coordinate = CLLocationCoordinate2D(latitude: annotation[0], longitude: annotation[1])
+
+        DispatchQueue.main.async {
+            guard let mapView = self.mapView, let view = self.view() else {
+                result(FlutterError(code: "VIEW_NULL", message: "mapView or view is nil", details: nil))
+                return
+            }
+
+            let point = mapView.convert(coordinate, toPointTo: view)
+            result(["point": [point.x, point.y]])
+        }
+    }
     }
 
     private func screenPointToLatLng(args: Dictionary<String, Any>, result: FlutterResult) -> Void {
