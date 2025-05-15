@@ -234,38 +234,28 @@ public class AppleMapController: NSObject, FlutterPlatformView {
         }
     }
     
-   private func cameraConvert(args: Dictionary<String, Any>, result: FlutterResult) {
-    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-        guard let self = self else {
-            result(FlutterError(code: "NULL_SELF", message: "Self is nil", details: nil))
-            return
-        }
-
-        // 1. annotation 파싱 및 검증
-        guard let annotation = args["annotation"] as? [Double], annotation.count == 2 else {
-            result(FlutterError(code: "INVALID_ARGS", message: "Invalid annotation format", details: nil))
-            return
-        }
-
-        let coordinate = CLLocationCoordinate2D(latitude: annotation[0], longitude: annotation[1])
-
-        
-        DispatchQueue.main.async {
-            guard let mapView = self.mapView else {
-                result(FlutterError(code: "VIEW_NULL", message: "mapView is nil", details: nil))
+       private func cameraConvert(args: Dictionary<String, Any>, result: @escaping FlutterResult) {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let strongSelf = self else {
+                result(FlutterError(code: "NULL_SELF", message: "self is nil", details: nil))
                 return
             }
 
-            guard let view = self.view() as? UIView else {
-                result(FlutterError(code: "VIEW_NULL", message: "view is invalid", details: nil))
+            guard let annotation = args["annotation"] as? [Double], annotation.count == 2 else {
+                result(FlutterError(code: "INVALID_ARGS", message: "Invalid annotation format", details: nil))
                 return
             }
 
-            let point = mapView.convert(coordinate, toPointTo: view)
-            result(["point": [point.x, point.y]])
+            let coordinate = CLLocationCoordinate2D(latitude: annotation[0], longitude: annotation[1])
+
+            DispatchQueue.main.async {
+                let view = strongSelf.view()
+                let point = strongSelf.mapView.convert(coordinate, toPointTo: view)
+                result(["point": [point.x, point.y]])
+            }
         }
     }
-}
+
 
 
     private func screenPointToLatLng(args: Dictionary<String, Any>, result: FlutterResult) -> Void {
