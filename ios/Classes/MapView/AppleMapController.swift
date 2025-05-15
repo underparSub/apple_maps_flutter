@@ -60,10 +60,11 @@ public class AppleMapController: NSObject, FlutterPlatformView {
     
        private func setMethodCallHandlers() {
         channel.setMethodCallHandler({ [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            if let args: Dictionary<String, Any> = call.arguments as? Dictionary<String,Any> {
-                guard let self =  self else {
+            guard let self =  self else {
                     result(nil)
                     return }
+            if let args: Dictionary<String, Any> = call.arguments as? Dictionary<String,Any> {
+              
                 switch(call.method) {
                 case "annotations#update":
                     self.annotationUpdate(args: args)
